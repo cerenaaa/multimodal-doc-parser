@@ -1,0 +1,19 @@
+name: CI
+"on":
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install anthropic pytest numpy
+      - run: python -c "from parsers.base_parser import BaseDocumentParser; print('base parser OK')"
+      - run: python -c "from parsers.invoice_parser import InvoiceParser; p=InvoiceParser(); assert 'invoice_number' in p._extraction_prompt(); print('invoice parser OK')"
+      - run: python -c "from parsers.table_parser import TableParser; p=TableParser(); assert 'tables' in p._extraction_prompt(); print('table parser OK')"
+      - run: python -c "from pipeline.batch_processor import BatchProcessor, ParseResult; print('batch processor OK')"
